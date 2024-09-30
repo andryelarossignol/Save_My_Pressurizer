@@ -1,19 +1,21 @@
 const mqtt = require("mqtt");
 
-const client = mqtt.connect("mqtt://119.8.146.205");
+const client = mqtt.connect("mqtt://test.mosquitto.org");
 let mqttMessage = "";
 
-client.on("message", (topic, message) => {
-    if (topic === "sensor/state") {
-        mqttMessage = message;
-    }
-});
-
 class ApiController {
+    ApiController() {
+        client.on("message", (topic, message) => {
+            if (topic === "sensor/state") {
+                console.log("message: " + message)
+                mqttMessage = message;
+            }
+        });
+    }
     async getMessage(request, response) {
         return response.json(mqttMessage);
     }
 
 }
 
-module.exports = SessionsController;
+module.exports = ApiController;
