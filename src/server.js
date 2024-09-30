@@ -4,6 +4,7 @@ const AppError = require('./utils/AppError')
 const express = require('express')
 const routes = require('./routes')
 const cors = require("cors")
+const wss = require("./controllers/ApiController")
 
 migrationsRun()
 
@@ -31,4 +32,5 @@ app.use((error, request, response, next) => {
 })
 
 const PORT= 3333;
-app.listen(PORT,()=> console.log(`Server is runing on Port ${PORT} with mqtt`));
+const server = app.listen(PORT,()=> console.log(`Server is runing on Port ${PORT} with mqtt`));
+wss(server)

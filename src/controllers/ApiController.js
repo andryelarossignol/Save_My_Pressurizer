@@ -1,21 +1,33 @@
-const mqtt = require("mqtt");
+const mqtt = require("mqtt")
+const WebSocket = require('ws')
 
-const client = mqtt.connect("mqtt://test.mosquitto.org");
-let mqttMessage = "";
+const client = mqtt.connect("mqtt://test.mosquitto.org")
 
-class ApiController {
-    ApiController() {
-        client.on("message", (topic, message) => {
-            if (topic === "sensor/state") {
-                console.log("message: " + message)
-                mqttMessage = message;
-            }
-        });
+client.subscribe("sensor/state", (err) => {
+    if(err) {
+        console.log("Error")
     }
-    async getMessage(request, response) {
-        return response.json(mqttMessage);
-    }
+})
 
+function onMessage(ws) {
+    client.on("message", (topic, message) => {
+        ws.send(message.toString())
+    })
 }
 
-module.exports = ApiController;
+module.exports = (server) => {
+    const wss = new WebSocket.Server({
+        server
+    })
+
+    wss.on('connection', (ws) => {
+        console.log('New WebSocket connection')
+        onMessage(ws)
+
+        ws.on('close', () => {
+            console.log('WebSocket connection closed')
+        })
+    })
+
+    return wss
+}
