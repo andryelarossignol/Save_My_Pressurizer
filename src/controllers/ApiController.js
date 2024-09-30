@@ -5,6 +5,7 @@ let mqttMessage = "";
 
 client.on("message", (topic, message) => {
     if (topic === "sensor/state") {
+        console.log("message: " +message)
         mqttMessage = message;
     }
 });
@@ -16,4 +17,4 @@ class ApiController {
 
 }
 
-module.exports = SessionsController;
+module.exports = ApiController;
