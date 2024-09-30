@@ -2,9 +2,11 @@ const mqtt = require("mqtt")
 const WebSocket = require('ws')
  
 const client = mqtt.connect("mqtt://test.mosquitto.org")
- 
+client.subscribe("sensor/state")
+
 function onMessage(ws) {
     client.on("message", (topic, message) => {
+
         ws.send(message.toString())
     })
 }
