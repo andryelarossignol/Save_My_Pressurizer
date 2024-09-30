@@ -1,9 +1,7 @@
 const mqtt = require("mqtt");
 
-const client = mqtt.connect("mqtt://119.8.14.205");
+const client = mqtt.connect("mqtt://test.mosquitto.org");
 let mqttMessage = "";
-
-
 
 class ApiController {
     ApiController() {
