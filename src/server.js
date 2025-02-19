@@ -4,11 +4,10 @@ const AppError = require('./utils/AppError')
 const express = require('express')
 const routes = require('./routes')
 const cors = require("cors")
-const wss = require("./controllers/ApiController")
 
 migrationsRun()
 
-const app = express()
+const app = new express()
 app.use(express.json())
 
 app.use(cors())
@@ -33,4 +32,33 @@ app.use((error, request, response, next) => {
 
 const PORT= 3333;
 const server = app.listen(PORT,()=> console.log(`Server is runing on Port ${PORT} with mqtt`));
-wss(server)
+
+const mqtt = require("mqtt")
+const WebSocket = require('ws')
+
+const client = mqtt.connect("mqtt://test.mosquitto.org")
+
+client.subscribe("sensor/state", (err) => {
+    if(err) {
+        console.log("Error")
+    }
+})
+
+function onMessage(ws) {
+    client.on("message", (topic, message) => {
+        ws.send(message.toString())
+    })
+}
+const wss = new WebSocket.Server({
+    server
+})
+
+wss.on('connection', (ws) => {
+    console.log('New WebSocket connection')
+    onMessage(ws)
+
+    ws.on('close', () => {
+        console.log('WebSocket connection closed')
+    })
+})
+
